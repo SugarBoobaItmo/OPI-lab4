@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+>
+    <h:head>
+        <meta name="viewport" content="initial-scale=1.0" />
+        <meta http-equiv="Content-Type" content="text/html" />
+        <title>Labwork 2</title>
+        <h:outputStylesheet library="css" name="style.css" />
+
+    </h:head>
+
+    <h:body>
+        <div id="header">
+            <h:outputText value="ФИО: Хабнер Георгий Евгеньевич" /><br />
+            <h:outputText value="Группа: P3231" /><br />
+            <h:outputText value="Вариант: 912737" /><br />
+        </div>
+        <h:form id="time-form">
+            <h:outputText value="#{dateTimeBean.currentDateTime}" id="clock" />
+        </h:form>
+        <h:form id="hiddenForm" style="display: none">
+            <h:commandButton id="updatePresentDateTime">
+                <f:ajax render="time-form:clock" />
+            </h:commandButton>
+        </h:form>
+        <h:form>
+            <h:commandLink value="Перейти на основную страницу" action="main" styleClass="to-main" />
+        </h:form>
+
+
+        <h:outputScript>
+            setInterval(function() {
+            document.getElementById("hiddenForm:updatePresentDateTime").click();
+            }, 9000);
+        </h:outputScript>
+    </h:body>
+</html>

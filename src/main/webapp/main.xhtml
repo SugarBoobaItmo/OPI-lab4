@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+>
+    <h:head>
+        <meta name="viewport" content="initial-scale=1.0" />
+        <meta http-equiv="Content-Type" content="text/html" />
+        <title>Проверка точки</title>
+        <h:outputStylesheet library="css" name="style.css" />
+    </h:head>
+    <h:body>
+        <div id="header">
+            <h:outputText value="ФИО: Хабнер Георгий Евгеньевич" /><br />
+            <h:outputText value="Группа: P3231" /><br />
+            <h:outputText value="Вариант: 912737" /><br />
+        </div>
+
+        <h:form id="points-select" class="points-form">
+            <table id="points-table">
+                <!-- create header for x y r -->
+                <tr>
+                    <th>X</th>
+                    <th>Y</th>
+                    <th>R</th>
+                    <th>Send</th>
+                    <th>Clear</th>
+                </tr>
+                <tr>
+                    <td>
+                        <div id="x-select">
+                            <!-- <h:outputText value="Coordinate X" /> -->
+                            <ui:repeat value="#{xBean.XValues}" var="xValue">
+                                <h:commandLink
+                                    action="#{xBean.setValue(xValue)}"
+                                    styleClass="coords-input"
+                                    value="#{xValue}"
+                                >
+                                    <f:ajax execute="@this" render="@form" />
+                                </h:commandLink>
+                            </ui:repeat>
+                            <h:inputHidden
+                                id="x"
+                                value="#{xBean.value}"
+                                validator="#{xBean.validate}"
+                                required="true"
+                                requiredMessage="X is required"
+                                converterMessage="X must be a number between -3 and 5"
+                                validatorMessage="X must be a number between -3 and 5"
+                            >
+                                <f:converter converterId="doubleConverter" />
+                            </h:inputHidden>
+                        </div>
+                    </td>
+                    <td>
+                        <div id="y-select">
+                            <!-- <h:outputLabel for="y" value="Coordinate Y" /> -->
+                            <h:inputText
+                                id="y"
+                                styleClass="coords-input"
+                                value="#{yBean.value}"
+                                maxlength="7"
+                                required="true"
+                                requiredMessage="Y is required"
+                                validatorMessage="Y must be a number between -3 and 5"
+                                converterMessage="Y must be a number between -3 and 5"
+                            >
+                                <f:converter converterId="doubleConverter" />
+                                <f:validateDoubleRange
+                                    minimum="-3"
+                                    maximum="5"
+                                    for="y"
+                                />
+                                <f:ajax execute="@this" render="r" />
+                            </h:inputText>
+                        </div>
+                    </td>
+                    <td>
+                        <div id="r-select">
+                            <!-- <h:outputLabel for="r" value="Coordinate R" /> -->
+                            <p:outputPanel>
+                                <p:spinner
+                                    id="r"
+                                    styleClass="spinnerField"
+                                    value="#{rBean.value}"
+                                    min="1.0"
+                                    max="3.0"
+                                    stepFactor="0.5"
+                                    required="true"
+                                    requiredMessage="R is required"
+                                    validatorMessage="R must be a number between 1 and 3"
+                                    validator="#{rBean.validate}"
+                                >
+                                    <p:ajax
+                                        process="@this"
+                                        update="canvas-panel results-table"
+                                        listener="#{resultsControllerBean.updateR(rBean.value)}"
+                                    />
+                                </p:spinner>
+                            </p:outputPanel>
+                        </div>
+                    </td>
+
+                    <td>
+                        <div id="smt-button">
+                            <h:commandButton value="Send" styleClass="button">
+                                <f:ajax
+                                    execute="@form"
+                                    listener="#{resultsControllerBean.addResult(xBean.value, yBean.value, rBean.value)}"
+                                    render="results-table canvas-panel @form"
+                                />
+                            </h:commandButton>
+                        </div>
+                    </td>
+                    <td>
+                        <div id="clear-button">
+                            <h:commandButton value="Clear" styleClass="button">
+                                <f:ajax
+                                    execute="@form"
+                                    listener="#{resultsControllerBean.clearResults}"
+                                    render="results-table canvas-panel @form"
+                                />
+                            </h:commandButton>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <h:messages styleClass="error" />
+        </h:form>
+
+        <canvas
+            id="canvas"
+            width="640px"
+            height="640px"
+            class="canvas"
+            onclick="clickPoint(event);"
+        ></canvas>
+
+        <h:dataTable
+            id="results-table"
+            var="result"
+            value="#{resultsControllerBean.results}"
+        >
+            <h:column>
+                <f:facet name="header">X</f:facet>
+                <h:outputText value="#{result.x}" />
+            </h:column>
+            <h:column>
+                <f:facet name="header">Y</f:facet>
+                <h:outputText value="#{result.y}" />
+            </h:column>
+            <h:column>
+                <f:facet name="header">R</f:facet>
+                <h:outputText value="#{result.r}" />
+            </h:column>
+            <h:column>
+                <f:facet name="header">Result</f:facet>
+                <h:outputText value="#{result.result}" />
+            </h:column>
+            <h:column>
+                <f:facet name="header">Time</f:facet>
+                <h:outputText value="#{result.time}" />
+            </h:column>
+            <h:column>
+                <f:facet name="header">Execution time</f:facet>
+                <h:outputText value="#{result.executionTime}" />
+            </h:column>
+        </h:dataTable>
+
+        <h:form id="page-back">
+            <!-- i need to set 0 to xBean.value -->
+            <h:commandLink value="Перейти назад" action="index" />
+        </h:form>
+
+        <p:outputPanel id="canvas-panel">
+            <!-- <script> -->
+            <h:outputScript>
+                #{resultsControllerBean.updateR(rBean.value)} var r =
+                #{rBean.value}; results = [];
+                <ui:repeat
+                    var="result"
+                    value="#{resultsControllerBean.results}"
+                >
+                    results.push({ x: #{result.x}, y: #{result.y}, r: r, result:
+                    "#{result.result}", });
+                </ui:repeat>
+                drawGraph(#{rBean.value}, results);
+            </h:outputScript>
+            <!-- </script> -->
+        </p:outputPanel>
+
+        <h:outputScript library="js" name="drawer.js" />
+
+        <h:outputScript> drawGraph(#{rBean.value}, results); </h:outputScript>
+
+        <h:form id="click-form">
+            <h:inputHidden id="x-click" value="#{xBean.value}" />
+            <h:inputHidden id="y-click" value="#{yBean.value}" />
+            <p:remoteCommand
+                name="clickGraph"
+                action="#{resultsControllerBean.addResult(xBean.value, yBean.value, rBean.value)}"
+                update="x-click y-click results-table canvas-panel points-select:r"
+            />
+        </h:form>
+    </h:body>
+</html>
+
+<!-- change script to ... and check f:messages on the anothe place -->

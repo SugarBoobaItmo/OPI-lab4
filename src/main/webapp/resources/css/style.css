@@ -1,0 +1,122 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: rgb(113 103 103);
+}
+
+table {
+    margin: auto;
+    margin-top: 20px;
+    border-collapse: collapse;
+    width: 80%;
+    max-width: 800px;
+    /* background color should be transparent */
+    background-color: rgba(255, 255, 255, 0.3);
+
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+th,
+td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #dddddd;
+}
+
+header {
+    font-family: fantasy;
+    font-weight: normal;
+    font-size: 14px;
+    margin: 20px auto;
+    color: rgb(0, 0, 0, 0.3);
+}
+
+header p {
+    margin: 0;
+}
+
+
+input[type="text"] {
+    width: 70%;
+    padding: 5px;
+    box-sizing: content-box;
+}
+
+.button {
+    margin-left: 1%;
+    padding: 5px 40px;
+    background-color: rgb(222 220 232);
+    color: rgb(14, 13, 13);
+    border: none;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: rgb(164, 140, 255, 0.8);
+}
+
+.canvas {
+    display: block;
+    margin: 1% auto; 
+    /* padding-left: 5% */
+}
+
+.coords-input {
+    margin: 5px;
+}
+
+
+#page-back {
+    margin-top: 20px;
+}
+
+a {
+    text-decoration: none;
+    color: rgb(113 103 103);
+    font-weight: bold;
+    /* padding: 5px; */
+}
+
+a:hover {
+    color: rgb(164, 140, 255, 0.8);
+}
+
+a.coords-input{
+    display:inline-block;
+    margin-right:2%;
+}
+
+.ui-spinner .ui-spinner-down {
+    background-color: rgb(222 220 232);
+    border: none;
+}
+
+.ui-spinner .ui-spinner-up {
+    background-color: rgb(222 220 232);
+    border: none;
+}
+
+.ui-spinner .ui-spinner-down:hover {
+    background-color: rgb(164, 140, 255, 0.8);
+}
+
+.ui-spinner .ui-spinner-up:hover {
+    background-color: rgb(164, 140, 255, 0.8);
+}
+
+.error {
+    color: red;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 30%;
+}
+
+#time-form {
+    text-align: center;
+    margin-top: 15%; 
+    font-size: 90px;
+}
+
+.to-main {
+    position: fixed;
+    bottom: 20px; 
+}
