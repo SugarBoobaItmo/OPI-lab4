@@ -1,18 +1,14 @@
 package com.example.model;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.validator.ValidatorException;
-import jakarta.inject.Named;
 import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
-@Named
-@ApplicationScoped
 public class RBean implements Serializable {
     private Double value = 1.0;
 

@@ -1,43 +1,71 @@
 package com.example.model;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
+import java.lang.management.ManagementFactory;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.management.MBeanServer;
+import javax.management.NotificationListener;
+import javax.management.ObjectName;
+import javax.management.StandardMBean;
+
 import com.example.db.ResultDAO;
 import com.example.entity.PointsResultEntity;
 import com.example.utils.AreaValidator;
+import com.example.mbeans.MissedRatio;
+import com.example.mbeans.MissedRatioMBean;
+import com.example.mbeans.PointsCounter;
+import com.example.mbeans.PointsCounterMBean;
 
 @Getter
 @Setter
-@Named
-@ApplicationScoped
+@Slf4j
 public class ResultsControllerBean implements Serializable {
-    @Inject
     private XBean xBean;
-    
-    @Inject
     private YBean yBean;
-    
-    @Inject
     private RBean rBean;
-    
     private Collection<PointsResultEntity> results = new ArrayList<>();
+    private PointsCounterMBean pointsCounter;
+    private MissedRatioMBean missedRatio;
 
     @Inject
     private ResultDAO resultDAO;
 
+
     @PostConstruct
     public void init() {
         results = resultDAO.getAllResults();
+        log.info("ResultsControllerBean initialized with {} results", results.size());
+
+        try {
+            MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+            
+            ObjectName pointsCounterName = new ObjectName("com.example.mbeans:type=PointsCounter");
+            pointsCounter = new PointsCounter(resultDAO);
+            mBeanServer.registerMBean(pointsCounter, pointsCounterName);
+
+            log.info("PointsCounter registered as MBean");
+
+            NotificationListener notificationListener = (notification, handback) -> {
+                System.out.println("Notification received: " + notification.getMessage());
+            };
+            mBeanServer.addNotificationListener(pointsCounterName, notificationListener, null, null);
+            
+            missedRatio = new MissedRatio(pointsCounter);
+            ObjectName missedRatioName = new ObjectName("com.example.mbeans:type=MissedRatio");
+            StandardMBean missedRatioMBean = new StandardMBean(missedRatio, MissedRatioMBean.class);
+            mBeanServer.registerMBean(missedRatioMBean, missedRatioName);
+        } catch (Exception e) {
+            log.error("Error initializing PointsCounter", e);
+        }
     }
 
     public void addResult(Double x, Double y, Double r) {
@@ -50,6 +78,7 @@ public class ResultsControllerBean implements Serializable {
         point.setR(r);
         point.setTime(java.time.LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")));
         boolean result = AreaValidator.checkArea(x, y, r);
+        pointsCounter.addPoint(result);
         point.setResult(result);
         point.setExecutionTime(String.format("%.9f", (System.nanoTime() - start) / 1000000000.0));
 
@@ -71,5 +100,6 @@ public class ResultsControllerBean implements Serializable {
     public void clearResults() {
         results.clear();
         resultDAO.clearResults();
+        pointsCounter.resetAndInitCounts();
     }
 }

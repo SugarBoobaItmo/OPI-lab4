@@ -1,2 +1,5 @@
 *.cfg
 target
+.DS_Store
+*.hprof
+*.jar
